@@ -5,42 +5,47 @@ import os, sys
 import time
 
 
+class ProgressBar:
 #===============================================================================
 # Class ProgressBar:
+# Print a progress bar in the terminal
 #===============================================================================
-#===============================================================================
-# Print a progress bar:
-# Input Value:
-# aktVal: integer value between 0 and 100
-#===============================================================================
-class ProgressBar:
     wheelChar = ['|', '/', '-', '\\']
 
-    def __init__( self, barType ):
+    def __init__( self, style ):
+#===============================================================================
+# The following styles can be selected by creating an object:
+# 1 - simple progress bar with single percentage step:
+#     [#######                    ] 37%
+# 2 - same as type 1 containing an additional "wheel char" (rotating dash) at
+#     the current position indicating activity between two percentage steps 
+#     [#######-                   ] 37%
+#===============================================================================
         self.lastVal = 0
-        self.barType = barType
+        self.style = style
         self.wheelPos = 0
-#         print 'Type = %d' % self.barType
 
     def printOut( self, percent ):
+#===============================================================================
+# Print the progress bar:
+# percent: integer value between 0 and 100
+#===============================================================================
         if percent < 0 or percent > 100:
             return
     
         if percent != self.lastVal:
             self.lastVal = percent
             self.wheelPos = 0
-        if self.barType == 1:
+        if self.style == 1:
             outStr = '[%s%s] %3d%% \r' % ( ( "#" * percent ), ( " " * ( 100 - percent ) ), percent )
     
-        if self.barType == 2:
+        if self.style == 2:
             if percent < 100:
                 outStr = '[%s%s%s] %3d%% \r' % ( ( "#" * percent ), ProgressBar.wheelChar[self.wheelPos], ( " " * ( 100 - percent - 1 ) ), percent )
             else:
                 outStr = '[%s] %3d%% \r' % ( ( "#" * percent ), percent )
-            if self.wheelPos >= 3:
-                self.wheelPos = 0
-            else:
-                self.wheelPos += 1
+            self.wheelPos += 1
+            self.wheelPos %= len( ProgressBar.wheelChar )
 
         sys.stdout.write( outStr )
         sys.stdout.flush()
@@ -52,9 +57,12 @@ class ProgressBar:
 #===============================================================================
 def main():
 
-    pbType = int( raw_input( 'Typ (1=normal 2=mit Zwischenschritten):' ) ) 
-    sleepTime = float( raw_input( 'Wartezeit [sec.]:' ) )
-    startVal = int( raw_input( 'Startwert [%]:' ) )
+    os.system( 'clear' )
+    print ( 'Test ProgressBar' )
+    print ( '=' * 80 )
+    pbType = int( raw_input( 'Type (1=simple 2=with "wheel char"):' ) ) 
+    sleepTime = float( raw_input( 'Sleep time [sec.]:' ) )
+    startVal = int( raw_input( 'Start value [%]:' ) )
 
     ii = startVal * 10
     pb = ProgressBar( pbType )
