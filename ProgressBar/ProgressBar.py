@@ -37,13 +37,13 @@ class ProgressBar:
             self.lastVal = percent
             self.wheelPos = 0
         if self.style == 1:
-            outStr = '[%s%s] %3d%% \r' % ( ( "#" * percent ), ( " " * ( 100 - percent ) ), percent )
+            outStr = '[%s%s] %3d%%\r' % ( ( "#" * percent ), ( " " * ( 100 - percent ) ), percent )
     
         if self.style == 2:
             if percent < 100:
-                outStr = '[%s%s%s] %3d%% \r' % ( ( "#" * percent ), ProgressBar.wheelChar[self.wheelPos], ( " " * ( 100 - percent - 1 ) ), percent )
+                outStr = '[%s%s%s] %3d%%\r' % ( ( "#" * percent ), ProgressBar.wheelChar[self.wheelPos], ( " " * ( 100 - percent - 1 ) ), percent )
             else:
-                outStr = '[%s] %3d%% \r' % ( ( "#" * percent ), percent )
+                outStr = '[%s] %3d%%\r' % ( ( "#" * percent ), percent )
             self.wheelPos += 1
             self.wheelPos %= len( ProgressBar.wheelChar )
 
@@ -60,9 +60,21 @@ def main():
     os.system( 'clear' )
     print ( 'Test ProgressBar' )
     print ( '=' * 80 )
-    pbType = int( raw_input( 'Type (1=simple 2=with "wheel char"):' ) ) 
-    sleepTime = float( raw_input( 'Sleep time [sec.]:' ) )
-    startVal = int( raw_input( 'Start value [%]:' ) )
+
+    choice = raw_input( 'Type (1=simple(default) 2=with "wheel char"):' )
+    if len( choice ) < 1:
+        choice = '1'
+    pbType = int( choice ) 
+
+    choice = raw_input( 'Sleep time [sec.] (0=default):' )
+    if len( choice ) < 1:
+        choice = '0'
+    sleepTime = float( choice ) / 10.0
+
+    choice = raw_input( 'Start value [%] (0=default):' )
+    if len( choice ) < 1:
+        choice = '0'
+    startVal = int( choice )
 
     ii = startVal * 10
     pb = ProgressBar( pbType )
@@ -73,7 +85,8 @@ def main():
         ii = ii + 1
         time.sleep( sleepTime )
     print
-    print ( time.time() - startTime )
+    print ( '%.4f sec.' % ( time.time() - startTime ) )
+#    print ( time.time() - startTime )
 
 
 #===============================================================================
