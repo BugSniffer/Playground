@@ -12,18 +12,22 @@ class ProgressBar:
 #===============================================================================
     wheelChar = ['|', '/', '-', '\\']
 
-    def __init__( self, style ):
+    def __init__( self, char = u"\u2588", style = 1 ):
 #===============================================================================
-# The following styles can be selected by creating an object:
-# 1 - simple progress bar with single percentage step:
-#     [#######                    ] 37%
-# 2 - same as type 1 containing an additional "wheel char" (rotating dash) at
-#     the current position indicating activity between two percentage steps 
-#     [#######-                   ] 37%
+# Parameters:
+# char  - String containig a character to be used for the progress bar
+# style - The following styles can be selected by creating an object:
+#         1 - simple progress bar with single percentage step:
+#             [#######                    ] 37%
+#         2 - same as type 1 containing an additional "wheel char" (rotating
+#             dash) at the current position indicating activity between two
+#             percentage steps 
+#             [#######-                   ] 37%
 #===============================================================================
-        self.lastVal = 0
-        self.style = style
-        self.wheelPos = 0
+        self.__char = char
+        self.__style = style
+        self.__lastVal = 0
+        self.__wheelPos = 0
 
     def printOut( self, percent ):
 #===============================================================================
@@ -33,23 +37,27 @@ class ProgressBar:
         if percent < 0 or percent > 100:
             return
     
-        if percent != self.lastVal:
-            self.lastVal = percent
-            self.wheelPos = 0
-        if self.style == 1:
-            outStr = '[%s%s] %3d%%\r' % ( ( "#" * percent ), ( " " * ( 100 - percent ) ), percent )
+        if percent != self.__lastVal:
+            self.__lastVal = percent
+            self.__wheelPos = 0
+        if self.__style == 1:
+            outStr = '[%s%s] %3d%%\r' % ( ( self.__char * percent ), ( " " * ( 100 - percent ) ), percent )
     
-        if self.style == 2:
+        if self.__style == 2:
             if percent < 100:
-                outStr = '[%s%s%s] %3d%%\r' % ( ( "#" * percent ), ProgressBar.wheelChar[self.wheelPos], ( " " * ( 100 - percent - 1 ) ), percent )
+                outStr = '[%s%s%s] %3d%%\r' % ( ( self.__char * percent ), ProgressBar.wheelChar[self.__wheelPos], ( " " * ( 100 - percent - 1 ) ), percent )
             else:
-                outStr = '[%s] %3d%%\r' % ( ( "#" * percent ), percent )
-            self.wheelPos += 1
-            self.wheelPos %= len( ProgressBar.wheelChar )
+                outStr = '[%s] %3d%%\r' % ( ( self.__char * percent ), percent )
+            self.__wheelPos += 1
+            self.__wheelPos %= len( ProgressBar.wheelChar )
 
         sys.stdout.write( outStr )
         sys.stdout.flush()
         self.lastVal = percent
+
+    def __del__( self ):
+        sys.stdout.write( ' ' * 107 + '\r' )
+        sys.stdout.flush()
 
 
 #===============================================================================
@@ -61,10 +69,17 @@ def main():
     print ( 'Test ProgressBar' )
     print ( '=' * 80 )
 
-    choice = raw_input( 'Type (1=simple(default) 2=with "wheel char"):' )
+    choice = raw_input( 'Style (1=simple(default) 2=with "wheel char"):' )
     if len( choice ) < 1:
         choice = '1'
-    pbType = int( choice ) 
+    pbStyle = int( choice ) 
+
+    str = 'Character (' + u'\u2588' + '=(default)):'
+    print ( str ),
+    choice = raw_input()
+    if len( choice ) < 1:
+        choice = u"\u2588"
+    pbChar = choice 
 
     choice = raw_input( 'Sleep time [sec.] (0=default):' )
     if len( choice ) < 1:
@@ -77,7 +92,7 @@ def main():
     startVal = int( choice )
 
     ii = startVal * 10
-    pb = ProgressBar( pbType )
+    pb = ProgressBar( char = pbChar, style = pbStyle )
 
     startTime = time.time()
     while ii <= 1000:
@@ -87,6 +102,7 @@ def main():
     print
     print ( '%.4f sec.' % ( time.time() - startTime ) )
 #    print ( time.time() - startTime )
+    del pb
 
 
 #===============================================================================
