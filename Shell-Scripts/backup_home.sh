@@ -29,5 +29,6 @@ do
 
     echo "["`date "+%Y-%m-%d %H:%M:%S"`"] Create archive '$DstDir/$tarName' from '$SrcDir/$dirName' ..."
     tar -cWf "$DstDir/$tarName" "$dirName"
+    gzip -kv "$DstDir/$tarName"
     echo "["`date "+%Y-%m-%d %H:%M:%S"`"] ... finished"
 done
