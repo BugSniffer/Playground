@@ -12,7 +12,7 @@ class ProgressBar:
 #===============================================================================
     wheelChar = ['|', '/', '-', '\\']
 
-    def __init__( self, char = u"\u2588", style = 1 ):
+    def __init__( self, capture = "Progress", char = u"\u2588", style = 1, min = 0, max = 100, unit = "%" ):
 #===============================================================================
 # Parameters:
 # char  - String containig a character to be used for the progress bar
@@ -23,37 +23,47 @@ class ProgressBar:
 #             dash) at the current position indicating activity between two
 #             percentage steps 
 #             [#######-                   ] 37%
+# min   - minimum value of the possible value range
+# max   - maximum value of the possible value range
+# unit  - unit of the values
 #===============================================================================
+        self.__capture = capture
         self.__char = char
         self.__style = style
-        self.__lastVal = 0
+        self.__lastVal = min
         self.__wheelPos = 0
+        self.__minVal = min
+        self.__maxVal = max
+        self.__unit = unit
+        self.__scale = float( self.__maxVal - self.__minVal ) / 100.0
 
-    def printOut( self, percent ):
+    def printOut( self, actVal ):
 #===============================================================================
 # Print the progress bar:
-# percent: integer value between 0 and 100
+# actVal: integer value between 0 and 100
 #===============================================================================
-        if percent < 0 or percent > 100:
+        if actVal < self.__minVal or actVal > self.__maxVal:
             return
     
-        if percent != self.__lastVal:
-            self.__lastVal = percent
+        if actVal != self.__lastVal:
+            self.__lastVal = actVal
             self.__wheelPos = 0
+
+        percent = int( float( actVal - self.__minVal ) / self.__scale )
         if self.__style == 1:
-            outStr = '[%s%s] %3d%%\r' % ( ( self.__char * percent ), ( " " * ( 100 - percent ) ), percent )
+            outStr = '%s[%s%s] %3d%s   \r' % ( self.__capture, ( self.__char * percent ), ( " " * ( 100 - percent ) ), actVal, self.__unit )
     
         if self.__style == 2:
-            if percent < 100:
-                outStr = '[%s%s%s] %3d%%\r' % ( ( self.__char * percent ), ProgressBar.wheelChar[self.__wheelPos], ( " " * ( 100 - percent - 1 ) ), percent )
+            if actVal < self.__maxVal:
+                outStr = '%s[%s%s%s] %3d%s   \r' % ( self.__capture, ( self.__char * percent ), ProgressBar.wheelChar[self.__wheelPos], ( " " * ( 100 - percent - 1 ) ), actVal, self.__unit )
             else:
-                outStr = '[%s] %3d%%\r' % ( ( self.__char * percent ), percent )
+                outStr = '%s[%s] %3d%s   \r' % ( self.__capture, ( self.__char * percent ), actVal, self.__unit )
             self.__wheelPos += 1
             self.__wheelPos %= len( ProgressBar.wheelChar )
 
         sys.stdout.write( outStr )
         sys.stdout.flush()
-        self.lastVal = percent
+        self.lastVal = actVal
 
     def __del__( self ):
         sys.stdout.write( ' ' * 107 + '\r' )
@@ -101,7 +111,6 @@ def main():
         time.sleep( sleepTime )
     print
     print ( '%.4f sec.' % ( time.time() - startTime ) )
-#    print ( time.time() - startTime )
     del pb
 
 
