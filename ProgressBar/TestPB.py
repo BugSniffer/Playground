@@ -17,16 +17,19 @@ def main():
     print ( '=' * 80 )
     print
 
-    choice = raw_input( 'Style (1=simple(default) 2=with "wheel char"):' )
+    choice = raw_input( 'Style (0=simple(default) 1=with "wheel char") 2=colored:' )
     if len( choice ) < 1:
-        choice = '1'
+        choice = '0'
     pbStyle = int( choice ) 
 
-    str = 'Character (' + u'\u2588' + '=(default)):'
+    pbChar = '#'
+    if pbStyle == 2:
+        pbChar = ' '
+    str = 'Character (\'%s\'=default):' % pbChar
     print ( str ),
     choice = raw_input()
     if len( choice ) < 1:
-        choice = u"\u2588"
+        choice = pbChar
     pbChar = choice 
 
     choice = raw_input( 'Sleep time [sec.] (0=default):' )
@@ -54,11 +57,16 @@ def main():
         choice = '0'
     startVal = int( choice )
 
+    choice = raw_input( 'End value [%] (75=default):' )
+    if len( choice ) < 1:
+        choice = '75'
+    endVal = int( choice )
+
     ii = startVal * 10
-    pb = ProgressBar( char = pbChar, style = pbStyle, min = minVal, max = maxVal, unit = unitStr )
+    pb = ProgressBar( capture = '', char = pbChar, style = pbStyle, min = minVal, max = maxVal, unit = unitStr )
 
     startTime = time.time()
-    while ii <= maxVal * 10:
+    while ii <= endVal * 10:
         pb.printOut( ii / 10 )
         ii = ii + 1
         time.sleep( sleepTime )
