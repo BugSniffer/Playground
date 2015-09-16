@@ -11,7 +11,7 @@ from ProgressBar import ProgressBar
 #===============================================================================
 def main():
 
-    os.system( 'clear' )
+#     os.system( 'clear' )
     print ( '=' * 80 )
     print ( 'Test ProgressBar' )
     print ( '=' * 80 )
@@ -19,7 +19,7 @@ def main():
 
     choice = raw_input( 'Style (0=simple(default) 1=with "wheel char") 2=colored:' )
     if len( choice ) < 1:
-        choice = '0'
+        choice = '2'
     pbStyle = int( choice ) 
 
     pbChar = '#'

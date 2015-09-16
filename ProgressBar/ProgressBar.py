@@ -75,8 +75,8 @@ class ProgressBar:
             self.__wheelPos %= len( ProgressBar.wheelChar )
 
         if self.__style == 2:
-            colBar = '\033[1;42m'
-            colNoBar = '\033[1;47m'
+            colBar = '\033[7;49m'  # standard terminal color
+            colNoBar = '\033[1;30m'  # grey
             colReset = '\033[0m'
 
             outStr = '%s%s%s%s%s%s%3d%s   \r' % ( self.__capture, colBar, ( self.__char * percent ), colNoBar, ( " " * ( 100 - percent ) ), colReset, actVal, self.__unit )
