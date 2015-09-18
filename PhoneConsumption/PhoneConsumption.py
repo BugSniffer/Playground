@@ -47,6 +47,8 @@ class PhoneConsumption:
 
         if self.openInFile() != 0:
             sys.exit( 1 )
+
+        self.__csvChar = ';'
     
     #===========================================================================
     # File IO
@@ -77,7 +79,7 @@ class PhoneConsumption:
         pb = [0] * 10
         header = [0] * 2
         while ii < 2:
-            header[ii] = self.inFileReadline()
+            header[ii] = self.inFileReadline().rstrip()
             if len( header[ii] ) == 0:
                 print( 'File corrupted!' )
                 return
@@ -85,37 +87,41 @@ class PhoneConsumption:
 
         ii = 0
         while True:
-            data = self.inFileReadline()
+            data = self.inFileReadline().rstrip()
             if len( data ) == 0:
                 # end of file reached
                 break
-            list = data.split( ',' )
+            list = data.split( self.__csvChar )
 
             phoneNo = list[0][:-7] + '-' + list[0][-7:-4] + ' ' + list[0][-4:-2] + ' ' + list[0][-2:]
-            print( '%s (%s) %s' % ( phoneNo, list[1], list[2] ) )
-            print( header[0].split( ',' )[6] )
+            if ( float( list[9][:-4].replace( ',', '.' ) ) < float( list[5][:-4].replace( ',', '.' ) ) ):
+                colorCode = '\033[1;31m'
+            else:
+                colorCode = ''
+            print( '%s (%s) %s (%s) %s%s: %s\033[0m' % ( phoneNo, list[1], list[2], list[5], colorCode, header[0].split( self.__csvChar )[9], list[9] ) )
+            print( header[0].split( self.__csvChar )[6] )
 
             # 3 and 7 contains remaining data volume
-            pb[ii] = ProgressBar( capture = header[1].split( ',' )[3] + ': ', max = int( list[3] ), unit = ' von ' + list[3] + ' MB ' )
-            pb[ii].printOut( int( list[7] ) )
+            pb[ii] = ProgressBar( capture = header[1].split( self.__csvChar )[3] + ': ', max = int( list[3] ), unit = ' von ' + list[3] + ' MB ' )
+            pb[ii].printOut( int( list[6] ) )
             print
 
             # 4 and 8 contains remaining number of minutes/SMS
             if len( list[4] ) > 0:
-                pb[ii] = ProgressBar( capture = header[1].split( ',' )[4] + ': ', max = int( list[4] ), unit = ' von ' + list[4] + ' Minuten' )
-                pb[ii].printOut( int( list[8] ) )
+                pb[ii] = ProgressBar( capture = header[1].split( self.__csvChar )[4] + ': ', max = int( list[4] ), unit = ' von ' + list[4] + ' Minuten' )
+                pb[ii].printOut( int( list[7] ) )
                 print
             else:
-                print( header[1].split( ',' )[4] + ': ' )
+                print( header[1].split( self.__csvChar )[4] + ': ' )
 
             # calculate remaining number of days
             today = localtime()
             todayObj = datetime.datetime( today.tm_year, today.tm_mon, today.tm_mday )
-            endDate = list[9].split( '.' )
+            endDate = list[8].split( '.' )
             endObj = datetime.datetime( int( endDate[2] ), int( endDate[1] ), int( endDate[0] ) )
             numDays = ( endObj - todayObj )
             
-            pb[ii] = ProgressBar( capture = header[0].split( ',' )[8] + ": ", max = 30, unit = ' Tage bis ' + str( endObj ).split( ' ' )[0] )
+            pb[ii] = ProgressBar( capture = header[0].split( self.__csvChar )[8] + ": ", max = 30, unit = ' Tage bis ' + str( endObj ).split( ' ' )[0] )
             pb[ii].printOut( numDays.days )
             print
             print( '-' * 140 )
@@ -125,11 +131,10 @@ class PhoneConsumption:
 def main( args ):
 
     os.system( 'clear' )
-    print sys.version_info
     print( '=' * 45 )
     today = localtime()
     print( 'Übersicht Handy-Guthaben' )
-    print( 'Zeitpunkt der Auswertung:', datetime.datetime( today.tm_year, today.tm_mon, today.tm_mday, today.tm_hour, today.tm_min, today.tm_sec ) )
+    print( 'Zeitpunkt der Auswertung:' ), datetime.datetime( today.tm_year, today.tm_mon, today.tm_mday, today.tm_hour, today.tm_min, today.tm_sec )
     print( '=' * 45 )
     print
 
