@@ -6,7 +6,8 @@
 # create archive for all directories
 #--------------------------------------------------------
 SrcDir="/home"
-DstDir="/media/rainer/Datensicherung/home"
+DstDir="/home"
+#DstDir="/media/rainer/Datensicherung/home"
 
 echo
 echo "***************************************************"
@@ -27,8 +28,9 @@ do
     tarName=`echo $dirName | tr -s ' ' '_'`".tar"
     dirName=`echo $dirName | tr -s ' ' '\ '`
 
-    echo "["`date "+%Y-%m-%d %H:%M:%S"`"] Create archive '$DstDir/$tarName' from '$SrcDir/$dirName' ..."
+    echo "["`date "+%Y-%m-%d %H:%M:%S"`"] Create tar archive '$DstDir/$tarName' from '$SrcDir/$dirName' ..."
     tar -cWf "$DstDir/$tarName" "$dirName"
-    gzip -kv "$DstDir/$tarName"
+    echo "["`date "+%Y-%m-%d %H:%M:%S"`"] Create tar.gz archive from '$DstDir/$tarName'"
+#    gzip -kv "$DstDir/$tarName"
     echo "["`date "+%Y-%m-%d %H:%M:%S"`"] ... finished"
 done
